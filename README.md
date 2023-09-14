@@ -205,14 +205,4 @@ is_objectification: true
 objectification_dir: './output/'
 # 需要处理的图片位置
 parse_dir: "./mtcnn_test/"
-
-
-
-
-
-
-
-
->>>>>>> Stashed changes
-
 ```
