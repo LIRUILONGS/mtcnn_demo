@@ -170,5 +170,49 @@ def calculate_blur(image):
 
 
 ```yaml
+### 人脸检测配置文件
+## mtcnn 检测相关：
+mtcnn:
+  zero:
+    # 最小人脸尺寸
+    min_face_size: 20
+    # 影响因子
+    scale_factor: 0.709
+    # 三层网络阈值
+    steps_threshold: 
+      - 0.6
+      - 0.7
+      - 0.7
+    # 结果置信度阈值
+    face_threshold: 0.995
+    # 模糊度阈值
+    blur_threshold: 100
+
+
+## hopenet 姿态检测相关
+hopenet:
+  zero:
+    # 模型位置
+    snapshot_path: "./content/dhp/hopenet_robust_alpha1.pkl"
+    # 欧拉角阈值
+    yaw_threshold: 45
+    pitch_threshold: 20
+    roll_threshold: 25 
+
+# 是否输出结果图片
+is_objectification: true
+# 输出图片结果
+objectification_dir: './output/'
+# 需要处理的图片位置
+parse_dir: "./mtcnn_test/"
+
+
+
+
+
+
+
+
+>>>>>>> Stashed changes
 
 ```
