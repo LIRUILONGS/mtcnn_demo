@@ -6,7 +6,7 @@ mtcnn:
     min_face_size: 20
     # 影响因子
     scale_factor: 0.709
-    # 网络阈值
+    # 三层网络阈值
     steps_threshold: 
       - 0.6
       - 0.7
@@ -20,21 +20,16 @@ mtcnn:
 ## hopenet 姿态检测相关
 hopenet:
   zero:
+    # 模型位置
     snapshot_path: "./content/dhp/hopenet_robust_alpha1.pkl"
-    yaw_threshold: 50
+    # 欧拉角阈值
+    yaw_threshold: 45
     pitch_threshold: 20
     roll_threshold: 25 
 
-
+# 是否输出结果图片
 is_objectification: true
+# 输出图片结果
 objectification_dir: './output/'
+# 需要处理的图片位置
 parse_dir: "./mtcnn_test/"
-
-
-
-
-## 模糊度相关
-
-
-
-

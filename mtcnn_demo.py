@@ -194,9 +194,9 @@ class MtcnnDetectFace:
                         "roll": roll
                     },
                     "face_confidence": confidence,
-                    #"face_native_image_b64": utils.get_img_to_base64(detected_face),
-                    #"face_native_images_b64": utils.get_Image_to_base64(detected_face_s),
-                    #"face_align_images_b64": utils.get_Image_to_base64(detected_face_align),
+                    "face_native_image_b64": utils.get_img_to_base64(detected_face),
+                    "face_native_images_b64": utils.get_Image_to_base64(detected_face_s),
+                    "face_align_images_b64": utils.get_Image_to_base64(detected_face_align),
                 })
                 
                     
