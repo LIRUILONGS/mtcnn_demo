@@ -3,27 +3,33 @@
 mtcnn Demo
 
 
-这是一个 人脸检测的 Demo， 用于输出适合人脸识别的 人脸数据集
+这是一个 人脸检测的 Demo， 用于输出适合人脸识别的 人脸数据集，通过 mtcnn 检测人脸，拿到置信度，通过 Hopenet 确定人脸是姿态，拿到姿态欧拉角，通过 拉普拉斯算子 确定人脸模糊度。
+
+这里默认对人脸做了对齐处理，通过 opencv 的 透视变化方法实现
+
+
 ---
 
-## 生成结果
+### 生成结果
 
 ```py
 python mtcnn_demo.py
 ```
 
-原图
-![在这里插入图片描述](./accese/famous-selfie.jpg)
+|原图|
+|--|
+|![在这里插入图片描述](./accese/famous-selfie.jpg)|
+|--|
+|生成标记后图片，`粉色`数据为标记 `不合格`数据，`全部标记为蓝色`数据为`合规`数据,也就是需要处理的数据|
+|![在这里插入图片描述](./accese/famous-selfi_res.jpg)|
+|--|
+|标记含义：|
+|![在这里插入图片描述](./accese/20230816060904.png)|
 
-生成标记后图片，`粉色`数据为标记 `不合格`数据，`全部蓝色`数据为`合规`数据,及需要处理的数据
 
-![在这里插入图片描述](./accese/famous-selfi_res.jpg)
+### 符合条件筛选的人脸
 
-标记含义：
 
-![在这里插入图片描述](./accese/20230816060904.png)
-
-符合条件筛选的人脸
 
 |人脸原始图片|对齐后的人脸|头部原始图片|对齐后头部姿态|
 |--|--|--|--|
@@ -33,19 +39,30 @@ python mtcnn_demo.py
 |![在这里插入图片描述](./accese/fbeff_0.99999_native_image_.jpg)|![在这里插入图片描述](./accese/fbeff_109.73.jpg)|![在这里插入图片描述](./accese/fbeff_native_images_.jpg)|![在这里插入图片描述](./accese/fbeffp_-18.03_y_-35.90_r_-0.88_109.73_.jpg)|
 ---
 
-## 检测使用 mtcnn
+### 部署
 
 创建 虚拟环境，导入依赖
+
 ```bash
 (base) C:\Users\liruilong>conda create -n mtcnn python==3.8.8
 ```
 
-<https://pypi.org/project/mtcnn/>
+```bash
+pip instasll -r  requirements.txt  -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
+```
+
+
+## 检测使用 mtcnn
+
+使用的下面的库，关于 mtcnn是什么，这里不多介绍，这里主要看下和识别精度相关的参数
+
+
+对应的pip 库位置：  <https://pypi.org/project/mtcnn/>
 
 ```py
 def __init__(self, weights_file: str = None, min_face_size: int = 20, steps_threshold: list = None,
                  scale_factor: float = 0.709):
-        ""
+        """
         Initializes the MTCNN.
         :param weights_file: file uri with the weights of the P, R and O networks from MTCNN. By default it will load
         the ones bundled with the package.
@@ -66,9 +83,9 @@ def __init__(self, weights_file: str = None, min_face_size: int = 20, steps_thre
         self._pnet, self._rnet, self._onet = NetworkFactory().build_P_R_O_nets_from_file(weights_file)
 ```
 
-影响 `MTCNN` 单张测试结果的准确度和测试用时的主要因素为：
+影响 `MTCNN` 单张测试结果的`准确度和测试用时`的主要因素为：
 
-`网络阈值(steps_threshold)`
+### `网络阈值(steps_threshold)`
 
 `MTCNN` 使用了一系列的阈值来进行人脸检测和关键点定位。这些阈值包括人脸 `置信度`阈值（Face Confidence Threshold）、`人脸框`与 `关键点`之间的IoU（Intersection over Union）阈值等。上面的构造函数 MTCNN的三个阶段（P-Net、R-Net和O-Net）中，相应的阈值设置为0.6、0.7和0.7。
 
@@ -78,11 +95,11 @@ def __init__(self, weights_file: str = None, min_face_size: int = 20, steps_thre
 
 ![在这里插入图片描述](./accese/a9b90374d2b8451abf78d252e366bbf4.png)
 
-`影响因子（原始图像的比例跨度）(scale_factor)`:
+### `影响因子（原始图像的比例跨度）(scale_factor)`:
 
 `MTCNN` 使用了图像金字塔来检测不同尺度的人脸。通过对图像进行 `缩放`，可以检测到不同大小的人脸。影响因子是指图像金字塔中的 `缩放因子`，控制了不同尺度之间的跨度。`较小`的影响因子会导致 `更多`的金字塔层级，可以检测到 `更小`的人脸，但会增加计算时间。`较大`的影响因子可以 `加快检测速度`，但可能会错过 `较小`的人脸。因此，选择合适的影响因子是在准确度和速度之间进行权衡的关键。
 
-要检测的 `最小面容参数(min_face_size)`:
+### 要检测的 `最小面容参数(min_face_size)`:
 
 这是 `MTCNN` 中用于 `过滤掉较小人脸`的参数。`最小面容参数`定义了一个 `人脸框`的 `最小边长`，小于此值的人脸将被 `忽略`。较小的最小面容参数可以检测到更小的人脸，但可能会增加 `虚警（错误接受）`的机会。较大的最小面容参数可以 `减少虚警`，但可能会漏检一些较小的人脸。因此，根据应用需求和场景，需要调整最小面容参数以平衡 `准确度和召回率`。
 
@@ -114,15 +131,15 @@ box 为人脸矩形框，keypoints 为人脸特征点，confidence 为置信度
 ]
 ```
 
-## 姿态判断 deep-head-pose
+## 姿态判断 Hopenet
 
-姿态判断使用  deep-head-pose
+姿态判断使用  Hopenet
 
 ![在这里插入图片描述](./accese/20191024094635949.png)
 
-[https://blog.csdn.net/qq_44001342/article/details/113522124](https://blog.csdn.net/qq_44001342/article/details/113522124)
+论文地址： [https://arxiv.org/abs/1710.00925](https://arxiv.org/abs/1710.00925)
 
-使用的模型项目
+使用的模型来自项目
 
 [https://github.com/natanielruiz/deep-head-pose](https://github.com/natanielruiz/deep-head-pose)
 
@@ -134,6 +151,58 @@ box 为人脸矩形框，keypoints 为人脸特征点，confidence 为置信度
 
 opencv  拉普拉斯方差方法 方法
 
+![在这里插入图片描述](./accese/detecting_blur_header.jpg)
+
+```py
+def calculate_blur(image):
+    # 计算图像的拉普拉斯梯度
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    laplacian = cv2.Laplacian(gray, cv2.CV_64F).var()
+    return laplacian
+```
+
+来源
+
 [https://pyimagesearch.com/2015/09/07/blur-detection-with-opencv/](https://pyimagesearch.com/2015/09/07/blur-detection-with-opencv/)
 
-![在这里插入图片描述](./accese/detecting_blur_header.jpg)
+
+## 配置文件简单说明：
+
+
+```yaml
+### 人脸检测配置文件
+## mtcnn 检测相关：
+mtcnn:
+  zero:
+    # 最小人脸尺寸
+    min_face_size: 20
+    # 影响因子
+    scale_factor: 0.709
+    # 三层网络阈值
+    steps_threshold: 
+      - 0.6
+      - 0.7
+      - 0.7
+    # 结果置信度阈值
+    face_threshold: 0.995
+    # 模糊度阈值
+    blur_threshold: 100
+
+
+## hopenet 姿态检测相关
+hopenet:
+  zero:
+    # 模型位置
+    snapshot_path: "./content/dhp/hopenet_robust_alpha1.pkl"
+    # 欧拉角阈值
+    yaw_threshold: 45
+    pitch_threshold: 20
+    roll_threshold: 25 
+
+# 是否输出结果图片
+is_objectification: true
+# 输出图片结果
+objectification_dir: './output/'
+# 需要处理的图片位置
+parse_dir: "./mtcnn_test/"
+```
