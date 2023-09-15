@@ -10,6 +10,7 @@
 """
 
 # here put the import lib
+import warnings
 
 import mtcnn
 import cv2
@@ -24,6 +25,7 @@ from PIL import Image
 from align_trans import warp_and_crop_face, get_reference_facial_points
 from hopenet_demo import HopenetFace
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+warnings.filterwarnings("ignore", category=UserWarning)
 
 
 class MtcnnDetectFace:
@@ -92,7 +94,7 @@ class MtcnnDetectFace:
         self.face_hopenet = face_hopenet
         return self
 
-    def detect_face(self, image):
+    def detect_face(self, image,fname):
         """
         @Time    :   2023/08/14 03:17:22
         @Author  :   liruilonger@gmail.com
@@ -104,8 +106,8 @@ class MtcnnDetectFace:
                        void
         """
 
-        img = cv2.imread(image)
-        img_PIL = Image.open(image)
+        img = utils.load_image_cvimg(image)
+        img_PIL = utils.load_image_plimg(image)
         detected_face = None
         # mtcnn expects RGB but OpenCV read BGR
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -185,8 +187,6 @@ class MtcnnDetectFace:
                         yaw, "0.2f") + "_r_" + format(roll, "0.2f") + "_" + format(blur_face, "0.2f")+"_.jpg", img_post)
                 resp.append({
                     "face_id": face_id,
-                    "face_coordinate": img_region,
-                    "facie5points": facial5points,
                     "face_blur": blur_face,
                     "face_pose": {
                         "pitch": pitch,
@@ -194,6 +194,8 @@ class MtcnnDetectFace:
                         "roll": roll
                     },
                     "face_confidence": confidence,
+                    "face_coordinate": img_region,
+                    "facie5points": facial5points,
                     "face_native_image_b64": utils.get_img_to_base64(detected_face),
                     "face_native_images_b64": utils.get_Image_to_base64(detected_face_s),
                     "face_align_images_b64": utils.get_Image_to_base64(detected_face_align),
@@ -204,12 +206,12 @@ class MtcnnDetectFace:
         faces = {
             "image_id": image_id,
             "face_total": len(detections),
+            "face_efficient_total_resp": len(resp),
             "resp": resp,
-            "face_total_resp": len(resp),
-            #"mark_image_face_b64": utils.get_img_to_base64(img)
+            "mark_image_face_b64": utils.get_img_to_base64(img),
         }
         if self.is_objectification:
-            cv2.imwrite('./output/'+os.path.basename(image), img)
+            cv2.imwrite('./output/'+os.path.basename(fname), img)
         return faces
 
     def alignment_procedure(self, img, facial5points):

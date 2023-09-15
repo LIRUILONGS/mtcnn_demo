@@ -7,168 +7,192 @@ mtcnn Demo
 
 这里默认对人脸做了对齐处理，通过 opencv 的 透视变化方法实现
 
-
+# HTTP 版本
 ---
 
-### 生成结果
-
-```py
-python mtcnn_demo.py
-```
-
-|原图|
-|--|
-|![在这里插入图片描述](./accese/famous-selfie.jpg)|
-|--|
-|生成标记后图片，`粉色`数据为标记 `不合格`数据，`全部标记为蓝色`数据为`合规`数据,也就是需要处理的数据|
-|![在这里插入图片描述](./accese/famous-selfi_res.jpg)|
-|--|
-|标记含义：|
-|![在这里插入图片描述](./accese/20230816060904.png)|
-
-
-### 符合条件筛选的人脸
-
-
-
-|人脸原始图片|对齐后的人脸|头部原始图片|对齐后头部姿态|
-|--|--|--|--|
-|![在这里插入图片描述](./accese/0988f_0.99530_native_image_.jpg)|![在这里插入图片描述](./accese/0988f_148.84.jpg)|![在这里插入图片描述](./accese/0988f_native_images_.jpg)|![在这里插入图片描述](./accese/0988fp_-15.88_y_-34.19_r_-3.72_148.84_.jpg)|
-|![在这里插入图片描述](./accese/7cc64_0.99995_native_image_.jpg)|![在这里插入图片描述](./accese/7cc64_147.88.jpg)|![在这里插入图片描述](./accese/7cc64_native_images_.jpg)|![在这里插入图片描述](./accese/7cc64p_-5.17_y_-2.71_r_12.81_147.88_.jpg)|
-|![在这里插入图片描述](./accese/b2e8f_0.99992_native_image_.jpg)|![在这里插入图片描述](./accese/b2e8f_132.15.jpg)|![在这里插入图片描述](./accese/b2e8f_native_images_.jpg)|![在这里插入图片描述](./accese/b2e8fp_-2.16_y_24.64_r_13.75_132.15_.jpg)|
-|![在这里插入图片描述](./accese/fbeff_0.99999_native_image_.jpg)|![在这里插入图片描述](./accese/fbeff_109.73.jpg)|![在这里插入图片描述](./accese/fbeff_native_images_.jpg)|![在这里插入图片描述](./accese/fbeffp_-18.03_y_-35.90_r_-0.88_109.73_.jpg)|
----
-
-### 部署
-
-创建 虚拟环境，导入依赖
-
+使用  tornado 构建 web 服务，目前只支持 token 认证
+ 
 ```bash
-(base) C:\Users\liruilong>conda create -n mtcnn python==3.8.8
+(mtcnn) C:\Users\liruilong\Documents\GitHub\mtcnn_demo>python tornado_http_server.py
+2023-09-15 01:35:39,939 - tornado_http_server.py[line:165] - INFO: 🚀 服务启动中
+2023-09-15 01:35:39,940 - tornado_http_server.py[line:140] - INFO: 🚀🚀 路由表信息加载
+2023-09-15 01:35:39,946 - tornado_http_server.py[line:156] - INFO: 🚀🚀🚀 人脸检测相关模型加载
+2023-09-15 01:35:40,860 - tornado_http_server.py[line:158] - INFO: 🚀🚀🚀🚀 构建上下文对象
+2023-09-15 01:35:40,861 - tornado_http_server.py[line:161] - INFO: 🚀🚀🚀🚀🚀 服务启动成功
+1/1 [==============================] - 0s 312ms/step
+1/1 [==============================] - 0s 168ms/step
+1/1 [==============================] - 0s 63ms/step
+1/1 [==============================] - 0s 44ms/step
+1/1 [==============================] - 0s 34ms/step
+1/1 [==============================] - 0s 21ms/step
+1/1 [==============================] - 0s 22ms/step
+1/1 [==============================] - 0s 20ms/step
+1/1 [==============================] - 0s 18ms/step
+1/1 [==============================] - 0s 22ms/step
+1/1 [==============================] - 0s 21ms/step
+1/1 [==============================] - 0s 21ms/step
+35/35 [==============================] - 0s 5ms/step
+2/2 [==============================] - 0s 9ms/step
+⚠️: 19e2304a0fae4c17be7b69f1fcb13513 中该置信度 0.939575731754303  未达到阈值 0.995，被弃用
+2023-09-15 01:35:44,095 - web.py[line:2344] - INFO: 200 POST /upload (127.0.0.1) 3233.51ms
 ```
 
-```bash
-pip instasll -r  requirements.txt  -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
-```
 
 
-## 检测使用 mtcnn
-
-使用的下面的库，关于 mtcnn是什么，这里不多介绍，这里主要看下和识别精度相关的参数
+接口信息见： `New Collection.postman_collection.json`
 
 
-对应的pip 库位置：  <https://pypi.org/project/mtcnn/>
++ `/` ： 欢迎页
++ `/livez` ： 存活探针
++ `/readyz`： 就绪探针
++ `/upload`： 上传文件解析
++ `/uploads`： 上传多文件解析
 
-```py
-def __init__(self, weights_file: str = None, min_face_size: int = 20, steps_threshold: list = None,
-                 scale_factor: float = 0.709):
-        """
-        Initializes the MTCNN.
-        :param weights_file: file uri with the weights of the P, R and O networks from MTCNN. By default it will load
-        the ones bundled with the package.
-        :param min_face_size: minimum size of the face to detect
-        :param steps_threshold: step's thresholds values
-        :param scale_factor: scale factor
-        """
-        if steps_threshold is None:
-            steps_threshold = [0.6, 0.7, 0.7]
+解析接口需要传 token
 
-        if weights_file is None:
-            weights_file = pkg_resources.resource_stream('mtcnn', 'data/mtcnn_weights.npy')
+## 解析接口返回信息
 
-        self._min_face_size = min_face_size
-        self._steps_threshold = steps_threshold
-        self._scale_factor = scale_factor
 
-        self._pnet, self._rnet, self._onet = NetworkFactory().build_P_R_O_nets_from_file(weights_file)
-```
-
-影响 `MTCNN` 单张测试结果的`准确度和测试用时`的主要因素为：
-
-### `网络阈值(steps_threshold)`
-
-`MTCNN` 使用了一系列的阈值来进行人脸检测和关键点定位。这些阈值包括人脸 `置信度`阈值（Face Confidence Threshold）、`人脸框`与 `关键点`之间的IoU（Intersection over Union）阈值等。上面的构造函数 MTCNN的三个阶段（P-Net、R-Net和O-Net）中，相应的阈值设置为0.6、0.7和0.7。
-
-1. 在 `P-Net`阶段，它是一个浅层的卷积神经网络，生成 `候选人脸框`时，只有置信度大于等于0.6的候选框将被接受，其他低于该阈值的候选框将被拒绝。
-2. 在 `R-Net`阶段，一个较深的卷积神经网络，用于对P-Net生成的候选框进行筛选和精细调整。R-Net会对每个候选框进行特征提取，并输出判断该框是否包含人脸的概率以及对应的边界框调整值，对于从P-Net阶段获得的候选框，只有置信度大于等于0.7的框将被接受，其他低于该阈值的框将被拒绝。
-3. 在 `O-Net`阶段，最深的卷积神经网络，用于进一步筛选和精细调整R-Net输出的候选框。O-Net与R-Net类似，对于从R-Net阶段获得的候选框，同样只有置信度大于等于0.7的框将被接受，其他低于该阈值的框将被拒绝。O-Net还可以输出 `人脸关键点`的位置坐标。最终，O-Net提供了最终的人脸检测结果和人脸关键点的位置信息。
-
-![在这里插入图片描述](./accese/a9b90374d2b8451abf78d252e366bbf4.png)
-
-### `影响因子（原始图像的比例跨度）(scale_factor)`:
-
-`MTCNN` 使用了图像金字塔来检测不同尺度的人脸。通过对图像进行 `缩放`，可以检测到不同大小的人脸。影响因子是指图像金字塔中的 `缩放因子`，控制了不同尺度之间的跨度。`较小`的影响因子会导致 `更多`的金字塔层级，可以检测到 `更小`的人脸，但会增加计算时间。`较大`的影响因子可以 `加快检测速度`，但可能会错过 `较小`的人脸。因此，选择合适的影响因子是在准确度和速度之间进行权衡的关键。
-
-### 要检测的 `最小面容参数(min_face_size)`:
-
-这是 `MTCNN` 中用于 `过滤掉较小人脸`的参数。`最小面容参数`定义了一个 `人脸框`的 `最小边长`，小于此值的人脸将被 `忽略`。较小的最小面容参数可以检测到更小的人脸，但可能会增加 `虚警（错误接受）`的机会。较大的最小面容参数可以 `减少虚警`，但可能会漏检一些较小的人脸。因此，根据应用需求和场景，需要调整最小面容参数以平衡 `准确度和召回率`。
-
-```py
-from mtcnn import MTCNN
-import cv2
-
-img = cv2.cvtColor(cv2.imread("ivan.jpg"), cv2.COLOR_BGR2RGB)
-detector = MTCNN()
-detector.detect_faces(img)
-```
-
-box 为人脸矩形框，keypoints 为人脸特征点，confidence 为置信度
-
-```bash
-[
-    {
-        'box': [277, 90, 48, 63],
-        'keypoints':
+```json
+{   
+    "image_id": "19e2304a0fae4c17be7b69f1fcb13513",
+    "face_total": 4,
+    "face_efficient_total_resp": 3,
+    "resp": [
         {
-            'nose': (303, 131),
-            'mouth_right': (313, 141),
-            'right_eye': (314, 114),
-            'left_eye': (291, 117),
-            'mouth_left': (296, 143)
+            "face_id": "af1a07cb20c04adcbf27d6315da8f0e2",
+            "face_blur": 513.2548600291768,
+            "face_pose": {
+                "pitch": -14.191238403320312,
+                "yaw": -22.01685333251953,
+                "roll": -1.958282470703125
+            },
+            "face_confidence": 0.9999302625656128,
+            "face_coordinate": [
+                571,
+                662,
+                59,
+                85
+            ],
+            "facie5points": {
+                "left_eye": [
+                    579,
+                    696
+                ],
+                "right_eye": [
+                    605,
+                    700
+                ],
+                "nose": [
+                    588,
+                    716
+                ],
+                "mouth_left": [
+                    580,
+                    728
+                ],
+                "mouth_right": [
+                    604,
+                    730
+                ]
+            },
+            "face_native_image_b64": "/9j/4A.................AQSkZ",
+            "face_native_images_b64": "iVBORw0........C",
+            "face_align_images_b64": "iVBOR..........QmCC"
         },
-        'confidence': 0.99851983785629272
-    }
-]
+        ,
+       .........
+    ],
+    "mark_image_face_b64": "/9jn...................//2Q=="
+}
+
+```
+## 调用方式
+
+### curl 
+
+```bash
+curl --location --request POST 'http://127.0.0.1:30025/upload' \
+--header 'Authorization: token' \
+--form 'image=@"/C:/Users/liruilong/Pictures/vlcsnap-2023-06-18-22h34m23s680.png"'```
 ```
 
-## 姿态判断 Hopenet
+### js
 
-姿态判断使用  Hopenet
+```js
+var myHeaders = new Headers();
+myHeaders.append("Authorization", "token");
 
-![在这里插入图片描述](./accese/20191024094635949.png)
+var formdata = new FormData();
+formdata.append("image", fileInput.files[0], "/C:/Users/liruilong/Pictures/vlcsnap-2023-06-18-22h34m23s680.png");
 
-论文地址： [https://arxiv.org/abs/1710.00925](https://arxiv.org/abs/1710.00925)
+var requestOptions = {
+  method: 'POST',
+  headers: myHeaders,
+  body: formdata,
+  redirect: 'follow'
+};
 
-使用的模型来自项目
-
-[https://github.com/natanielruiz/deep-head-pose](https://github.com/natanielruiz/deep-head-pose)
-
-一个 大佬写好的 Demo
-
-[https://colab.research.google.com/drive/1vvntbLyVxxBHoVN0e6-pfs7gB3pp-VUS?usp=sharing](https://colab.research.google.com/drive/1vvntbLyVxxBHoVN0e6-pfs7gB3pp-VUS?usp=sharing)
-
-## 模糊度检测 拉普拉斯算子
-
-opencv  拉普拉斯方差方法 方法
-
-![在这里插入图片描述](./accese/detecting_blur_header.jpg)
+fetch("http://127.0.0.1:30025/upload", requestOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));
+```
+### python 
 
 ```py
-def calculate_blur(image):
-    # 计算图像的拉普拉斯梯度
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    laplacian = cv2.Laplacian(gray, cv2.CV_64F).var()
-    return laplacian
+import requests
+
+url = "http://127.0.0.1:30025/upload"
+
+payload={}
+files=[
+  ('image',('vlcsnap-2023-06-18-22h34m23s680.png',open('/C:/Users/liruilong/Pictures/vlcsnap-2023-06-18-22h34m23s680.png','rb'),'image/png'))
+]
+headers = {
+  'Authorization': 'token'
+}
+
+response = requests.request("POST", url, headers=headers, data=payload, files=files)
+
+print(response.text)
+
 ```
 
-来源
+多文件请求报文
 
-[https://pyimagesearch.com/2015/09/07/blur-detection-with-opencv/](https://pyimagesearch.com/2015/09/07/blur-detection-with-opencv/)
+```bash
+POST /uploads HTTP/1.1
+Host: 127.0.0.1:30025
+Authorization: token
+Content-Length: 998
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
+----WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="/C:/Users/liruilong/Pictures/vlcsnap-2023-08-10-02h42m20s009.png"
+Content-Type: image/png
 
-## 配置文件简单说明：
+(data)
+----WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="/C:/Users/liruilong/Pictures/vlcsnap-2023-08-10-02h42m20s358.png"
+Content-Type: image/png
 
+(data)
+----WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="/C:/Users/liruilong/Pictures/vlcsnap-2023-08-10-02h42m20s687.png"
+Content-Type: image/png
 
-```yaml
+(data)
+----WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="/C:/Users/liruilong/Pictures/vlcsnap-2023-08-10-02h42m20s996.png"
+Content-Type: image/png
+
+(data)
+----WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="/C:/Users/liruilong/Pictures/vlcsnap-2023-08-10-02h42m21s326.png"
+Content-Type: image/png
+
+(data)
+----WebKitFormBoundary7MA4YWxkTrZu0gW
 
 ```
