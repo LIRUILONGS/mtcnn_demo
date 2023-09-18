@@ -8,6 +8,10 @@ import utils
 import json
 import yaml_utils as Yaml
 import time
+from tornado import gen
+from tornado.options import options, define
+
+
 
 tornado.log.enable_pretty_logging()
 
@@ -108,8 +112,8 @@ class UploadHandler(tornado.web.RequestHandler):
     @Version :   1.0
     @Desc    :   人脸文件上传检测
     """
-
-    async def post(self):
+    @gen.coroutine
+    def post(self):
         """
         @Time    :   2023/09/14 23:03:32
         @Author  :   liruilonger@gmail.com
@@ -127,19 +131,29 @@ class UploadHandler(tornado.web.RequestHandler):
         try:
             # 验证图片完整性
             if utils.is_image_file(body):
-                context = self.application.my_context
-                faces = context.mtcnn.detect_face(body, filename)
-                json_data = json.dumps(faces)
-                self.set_header('Content-Type', 'application/json')
+                json_data =  yield self.detect_face(body, filename)
                 self.write(json_data)
             else:
                 self.set_status(400)
-                self.finish(f"File {filename} uploaded successfully, parsing failed, image incomplete ^_^")
-
+                self.finish(f"File {filename} uploaded successfully, parsing failed, image incomplete ^_^")                
         except:
             self.set_status(500)
             self.finish(
-                "File {filename} uploaded successfully, parsing failed for unknown reason ^_^")
+                f"File {filename} uploaded successfully, parsing failed for unknown reason ^_^")
+    
+    @gen.coroutine
+    def detect_face(self,body, filename):
+        """
+        @Time    :   2023/09/17 21:27:47
+        @Author  :   liruilonger@gmail.com
+        @Version :   1.0
+        @Desc    :   基于生成器的协程
+        """
+        context = self.application.my_context
+        faces =  context.mtcnn.detect_face(body, filename)
+        json_data = json.dumps(faces)
+        return json_data
+
 
 
 @token_auth_middleware
@@ -178,8 +192,7 @@ class UploadsHandler(tornado.web.RequestHandler):
                 # 验证图片完整性
 
                 if utils.is_image_file(body):
-                    context = self.application.my_context
-                    faces = context.mtcnn.detect_face(body, filename)
+                    faces = await   self.detect_face(body, filename)
                     face_imges.append(faces)
 
             json_data = json.dumps(face_imges)
@@ -189,6 +202,17 @@ class UploadsHandler(tornado.web.RequestHandler):
         except:
             self.write(f"文件  {filename}  上传成功，解析失败 ^_^ ")
 
+    async def detect_face(self,body, filename):
+        """
+        @Time    :   2023/09/17 21:27:47
+        @Author  :   liruilonger@gmail.com
+        @Version :   1.0
+        @Desc    :    async 和 await 关键字
+        """
+        context = self.application.my_context
+        faces =  context.mtcnn.detect_face(body, filename)
+        json_data = json.dumps(faces)
+        return json_data
 
 def make_app():
     """

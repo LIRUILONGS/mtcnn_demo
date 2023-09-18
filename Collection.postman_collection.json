@@ -1,0 +1,167 @@
+{
+	"info": {
+		"_postman_id": "380a140e-8720-437d-b193-7b72dff4cdfb",
+		"name": "New Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "wellcome",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:30025/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "30025",
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "live",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:30025/livez",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "30025",
+					"path": [
+						"livez"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ready",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:30025/readyz",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "30025",
+					"path": [
+						"readyz"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "upload",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImF2MmJVZ3d6M21JRC1BZUwwaHlDdzZHSGNyaVJON1BkUHF6MlhPV2NfX00ifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJoZWFkbGFtcC1hZG1pbi10b2tlbi04ZDVwciIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJoZWFkbGFtcC1hZG1pbiIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjI0NDMxNTA4LWU4ZjEtNGYxOC1hMWIxLTlmMmUzZmFhNDU3ZSIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDprdWJlLXN5c3RlbTpoZWFkbGFtcC1hZG1pbiJ9.oSA_i8gZOXYNRQMyoUKCK_wivtSiEjJ78EDUzZ1R7_HFxiLBKWLtxYN81wyf19bp9y9BFc2YYAW9lBy9QfVxg6LzBhW1sb4tcJJ0SOldxQX8z9kWK9m1MPMMs3aqtt1S9n8ShMBeobyY5AXSkBMDvVh6_E1P22dnPyOH7r_m0DEM0pgOP7B347sDKHiKx60hHBTfayvF7WDgfVlqsItBrc-MupC7NieRe8pztCllQ8awPksZXPRAJdcKwlSPvskoYxaqOBGbfZvFAFeLJaiGHdwkb6jUKyVfcB_hX_Pm5aEHGU8LZq7twrup859zxLxwn3nAgQpM6-NySZt8ax24kg",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": [
+								"/C:/Users/liruilong/Pictures/vlcsnap-2023-08-10-02h42m50s484.png",
+								"/C:/Users/liruilong/Pictures/vlcsnap-2023-08-10-02h42m50s776.png",
+								"/C:/Users/liruilong/Pictures/vlcsnap-2023-08-10-02h42m51s092.png",
+								"/C:/Users/liruilong/Pictures/vlcsnap-2023-08-10-02h42m51s403.png",
+								"/C:/Users/liruilong/Pictures/vlcsnap-2023-08-10-02h42m51s685.png",
+								"/C:/Users/liruilong/Pictures/vlcsnap-2023-08-10-02h42m51s980.png",
+								"/C:/Users/liruilong/Pictures/vlcsnap-2023-08-10-02h42m52s283.png"
+							]
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:30025/upload",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "30025",
+					"path": [
+						"upload"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "uploads",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImF2MmJVZ3d6M21JRC1BZUwwaHlDdzZHSGNyaVJON1BkUHF6MlhPV2NfX00ifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJoZWFkbGFtcC1hZG1pbi10b2tlbi04ZDVwciIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJoZWFkbGFtcC1hZG1pbiIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjI0NDMxNTA4LWU4ZjEtNGYxOC1hMWIxLTlmMmUzZmFhNDU3ZSIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDprdWJlLXN5c3RlbTpoZWFkbGFtcC1hZG1pbiJ9.oSA_i8gZOXYNRQMyoUKCK_wivtSiEjJ78EDUzZ1R7_HFxiLBKWLtxYN81wyf19bp9y9BFc2YYAW9lBy9QfVxg6LzBhW1sb4tcJJ0SOldxQX8z9kWK9m1MPMMs3aqtt1S9n8ShMBeobyY5AXSkBMDvVh6_E1P22dnPyOH7r_m0DEM0pgOP7B347sDKHiKx60hHBTfayvF7WDgfVlqsItBrc-MupC7NieRe8pztCllQ8awPksZXPRAJdcKwlSPvskoYxaqOBGbfZvFAFeLJaiGHdwkb6jUKyVfcB_hX_Pm5aEHGU8LZq7twrup859zxLxwn3nAgQpM6-NySZt8ax24kg",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": [
+								"/C:/Users/liruilong/Pictures/vlcsnap-2023-08-10-02h42m21s629.png",
+								"/C:/Users/liruilong/Pictures/vlcsnap-2023-08-10-02h42m21s911.png",
+								"/C:/Users/liruilong/Pictures/vlcsnap-2023-08-10-02h42m22s195.png",
+								"/C:/Users/liruilong/Pictures/vlcsnap-2023-08-10-02h42m22s513.png",
+								"/C:/Users/liruilong/Pictures/vlcsnap-2023-08-10-02h42m22s793.png",
+								"/C:/Users/liruilong/Pictures/vlcsnap-2023-08-10-02h42m23s082.png",
+								"/C:/Users/liruilong/Pictures/vlcsnap-2023-08-10-02h42m23s424.png"
+							]
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:30025/uploads",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "30025",
+					"path": [
+						"uploads"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

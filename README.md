@@ -10,6 +10,13 @@ mtcnn Demo
 # HTTP 版本
 ---
 
+## flasl 版本
+
+
+
+
+## tornado 版本
+
 使用  tornado 构建 web 服务，目前只支持 token 认证
  
 ```bash
@@ -196,3 +203,64 @@ Content-Type: image/png
 ----WebKitFormBoundary7MA4YWxkTrZu0gW
 
 ```
+
+### tornado 编写异步代码
+
+
+1. 基于生成器的协程
+协程使用 Python 中的关键字 yield 来替代链式回调来实现挂起和继续程序的执行，需要使用gen.coroutine 来装饰生成器函数
+
+
+```py
+import tornado.ioloop
+from tornado.web import RequestHandler, Application
+from tornado.httpserver import HTTPServer
+from tornado.options import options, define
+from tornado.httpclient import AsyncHTTPClient
+from tornado import gen
+
+define('port', default=8000, help='监听端口')
+
+
+class HelloHandler(RequestHandler):
+    @gen.coroutine
+    def get(self):
+        url = "http://coolpython.net"
+        response_code = yield self.fetch_coroutine(url)
+        self.finish(str(response_code))
+
+    @gen.coroutine
+    def fetch_coroutine(self, url):
+        http_client = AsyncHTTPClient()
+        response = yield http_client.fetch(url)
+        return response.code
+
+if __name__ == '__main__':
+    options.parse_command_line()
+    handlers_routes = [
+        (r'/', HelloHandler)
+    ]
+    app = Application(handlers=handlers_routes)
+    http_server = HTTPServer(app)
+    http_server.listen(options.port)
+    tornado.ioloop.IOLoop.current().start()
+
+```
+
+从处理请求的get方法开始，就需要使用gen.coroutine 装饰器，fetch_coroutine 是一个协程，调用它时，必须加上yield 关键字，这样get方法也是一个基础生成器的协程。
+
+```py
+class HelloHandler(RequestHandler):
+
+    async def get(self):
+        url = "http://coolpython.net"
+        response_code = await self.fetch_coroutine(url)
+        self.finish(str(response_code))
+
+    async def fetch_coroutine(self, url):
+        http_client = AsyncHTTPClient()
+        response = await http_client.fetch(url)
+        return response.code
+```
+
+CPU计算过于密集，那么此种情况下tornado无能为力，单进程条件下，CPU导致的阻塞是没有办法进行异步处理的。tornado 能够异步处理的是那些网络IO操作，所以并不合适
