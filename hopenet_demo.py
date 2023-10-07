@@ -1,3 +1,19 @@
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+"""
+@File    :   Hopenet_demo.py
+@Time    :   2023/10/06 22:08:22
+@Author  :   Li Ruilong
+@Version :   1.0
+@Contact :   liruilonger@gmail.com
+@Desc    :   头部姿态检测
+"""
+
+
+# here put the import lib
+
+
+
 import sys
 import os
 import argparse

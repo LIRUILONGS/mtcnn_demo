@@ -156,3 +156,4 @@ def detect_face(body, filename):
 if __name__ == "__main__":
     init_obj()
     app.run(port=30025, host="0.0.0.0", debug=True)  # 调用run方法，设定端口号，启动服务
+

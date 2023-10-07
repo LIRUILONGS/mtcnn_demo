@@ -635,8 +635,99 @@ def is_image_file(image_bytes):
     except (IOError, SyntaxError):
         return False
 
+
+
+
+def is_monochrome(image_path, threshold=10):
+    """
+    @Time    :   2023/09/26 04:25:52
+    @Author  :   liruilonger@gmail.com
+    @Version :   1.0
+    @Desc    :   
+    """
+    
+    image = Image.open(image_path)
+    image = image.convert('L')  # 将图像转换为灰度图像
+
+    # 获取图片的所有像素值
+    pixels = image.getdata()
+    # 获取图像的直方图
+    histogram = image.histogram()
+
+    # 计算直方图的标准差
+    std_dev = sum((value - (sum(histogram) / len(histogram)))**2 for value in histogram) / len(histogram)
+    print(std_dev)
+    # 判断标准差是否小于阈值
+    if std_dev <= threshold:
+        return True
+    else:
+        return False
+
+
+
+def get_color_ratio(image_path,quantity_threshold='35000',occupancy_threshold='0.006092959104938272'):
+    """
+    @Time    :   2023/10/06 22:13:51
+    @Author  :   liruilonger@gmail.com
+    @Version :   1.0
+    @Desc    :   判断图片颜色是否为单一颜色
+    Occupancy threshold: 颜色种类阈值
+    quantity_threshold： 单一颜色占比阈值
+
+
+
+    """
+    
+    # 打开图像
+    image = Image.open(image_path)
+    # 转换为RGB模式
+    image_rgb = image.convert("RGB")
+    # 获取图像尺寸
+    width, height = image_rgb.size
+
+    # 统计颜色频次
+    color_counts = {}
+    total_pixels = width * height
+
+    for y in range(height):
+        for x in range(width):
+            # 获取像素颜色
+            pixel = image_rgb.getpixel((x, y))
+            # 统计颜色频次
+            if pixel in color_counts:
+                color_counts[pixel] += 1
+            else:
+                color_counts[pixel] = 1
+
+    # 计算颜色占比
+    color_ratios = {}
+    for color, count in color_counts.items():
+        ratio = count / total_pixels
+        color_ratios[color] = ratio
+    #if  len(color_ratios) < quantity_threshold:
+    #    return True
+    #max_color =  max(zip(result.values(),result.keys()))
+    #first_item = next(iter(max_color.items()))
+    #value = first_item[1]
+#
+    #if  occupancy_threshold < first_item :
+
+    return color_ratios
+
+
 if __name__ == "__main__":
     # date =  get_Image_size("C:\\Users\\liruilong\\Documents\\GitHub\\AdaFace_demo\\res\\wj.jpg")
     # print(date )
-    for path in paths.list_images("./res/liruilong"):
-        print(get_file_md5(path))
+    #for path in paths.list_images("./res/liruilong"):
+    #    print(get_file_md5(path))
+    
+
+    # 调用函数判断图片是否为单色或接近单色图片
+    img_path = "z:\\1111.jpg" #"z:\\20230926043918.png"
+    result = get_color_ratio(img_path)
+    print(result)
+    print(max(zip(result.values(),result.keys())))
+    print(len(result))
+
+       
+
