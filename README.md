@@ -25,6 +25,14 @@ CMD ["python", "flask_http_server.py"]
 
 ```
 
+镜像位置：
+
+[https://hub.docker.com/repository/docker/liruilong/mtcnn-hopenet-laplacian-face/general](https://hub.docker.com/repository/docker/liruilong/mtcnn-hopenet-laplacian-face/general)
+
+```bash
+docker pull liruilong/mtcnn-hopenet-laplacian-face
+```
+
 ## flasl 版本
 
 
