@@ -14,14 +14,17 @@ dependencies:
   - pip:
     - absl-py==1.4.0
     - astunparse==1.6.3
+    - blinker==1.6.2
     - cachetools==5.3.1
     - certifi==2023.5.7
     - charset-normalizer==3.1.0
+    - click==8.1.7
     - colorama==0.4.6
     - coloredlogs==15.0.1
     - contourpy==1.0.7
     - cycler==0.11.0
     - filelock==3.12.0
+    - flask==2.3.3
     - flatbuffers==23.5.26
     - fonttools==4.40.0
     - gast==0.4.0
@@ -36,6 +39,7 @@ dependencies:
     - importlib-metadata==6.8.0
     - importlib-resources==5.12.0
     - imutils==0.5.4
+    - itsdangerous==2.1.2
     - jinja2==3.1.2
     - keras==2.13.1
     - kiwisolver==1.4.4
@@ -55,10 +59,12 @@ dependencies:
     - packaging==23.1
     - pandas==2.0.1
     - pillow==9.5.0
+    - pipdeptree==2.13.0
     - protobuf==4.23.2
     - psutil==5.9.5
     - pyasn1==0.5.0
     - pyasn1-modules==0.3.0
+    - pyjwt==2.8.0
     - pyparsing==3.0.9
     - pyreadline3==3.4.1
     - python-dateutil==2.8.2
@@ -80,12 +86,13 @@ dependencies:
     - termcolor==2.3.0
     - torch==2.0.1
     - torchvision==0.15.2
+    - tornado==6.3.3
     - tqdm==4.65.0
     - typing_extensions==4.5.0
     - tzdata==2023.3
     - ultralytics==8.0.114
     - urllib3==1.26.16
-    - werkzeug==2.3.6
+    - werkzeug==2.3.7
     - wrapt==1.15.0
     - zipp==3.15.0
 prefix: C:\Users\liruilong\AppData\Local\conda\conda\envs\mtcnn
