@@ -1,3 +1,16 @@
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+"""
+@File    :   tornado_http_server.py
+@Time    :   2023/10/10 01:39:12
+@Author  :   Li Ruilong
+@Version :   1.0
+@Contact :   liruilonger@gmail.com
+@Desc    :   tornado 版本 HTTPd 服务
+"""
+
+# here put the import lib
+
 import asyncio
 
 import tornado.web
@@ -60,6 +73,18 @@ def token_auth_middleware(handler_class):
                 return
 
     return TokenAuthMiddleware
+
+class TokenHandler(tornado.web.RequestHandler):
+    """
+    @Time    :   2023/09/14 05:52:27
+    @Author  :   liruilonger@gmail.com
+    @Version :   1.0
+    @Desc    :   获取 token
+    """
+
+    async def get(self):
+        valid_tokens = tornado_config["token"]
+        self.write(valid_tokens)
 
 
 class MainHandler(tornado.web.RequestHandler):
@@ -225,6 +250,7 @@ def make_app():
 
     return tornado.web.Application([
         (r"/", MainHandler),
+        (r"/token", TokenHandler),
         (r"/livez", LivenessProbeHandler),
         (r"/readyz", ReadinessProbeHandler),
         (r"/upload", UploadHandler),

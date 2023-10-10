@@ -24,19 +24,25 @@ import utils
 import logging
 import json
 import os
+
+from functools import wraps
 from flask import abort
 from concurrent.futures import ThreadPoolExecutor
 from mtcnn_demo import MtcnnDetectFace
 import yaml_utils as Yaml
+
+
+
+
+
 app = Flask(__name__)  # 实例化并命名为app实例
 # 线程池执行器
 executor = ThreadPoolExecutor()
 
-
 face_log = logging.basicConfig(level=logging.INFO, )
 
 config = Yaml.get_yaml_config(file_name="config/config.yaml")
-tornado_config = config['flask']
+flask_config = config['flask']
 
 
 
@@ -70,6 +76,26 @@ def init_obj():
     logging.info('🚀🚀🚀🚀🚀 \033[32m服务启动成功\033[0m')
 
 
+# 定义装饰器函数，用于验证 Token
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get('Authorization')
+        if not token:
+            return jsonify({'message': 'Token is missing'}), 401
+
+        valid_tokens = flask_config["token"]
+        # 如果 Token 无效，返回未授权的响应
+        if token not in valid_tokens:
+             return jsonify({'message': 'Token is invalid'}), 401
+
+        # 如果 Token 有效，继续处理请求
+        return f(*args, **kwargs)
+
+    return decorated
+
+
+
 @app.route("/")
 def index():
     """
@@ -93,6 +119,15 @@ def livez():
     return {'result': " live  ^_^"}
 
 
+@app.route("/token")
+def token():
+    return jsonify({
+            "code": 200,
+            "message": "获取 token",
+            "token": flask_config["token"],
+        })
+
+
 @app.route("/readyz")
 def readyz():
     """
@@ -109,7 +144,9 @@ def readyz():
     
 
 
+
 @app.route("/upload", methods=["POST"])
+@token_required
 def upload():
     """
     @Time    :   2023/09/18 01:41:00
@@ -140,6 +177,42 @@ def upload():
 
 
 
+@app.route("/uploads", methods=["POST"])
+@token_required
+def uploads():
+    """
+    @Time    :   2023/10/10 02:22:33
+    @Author  :   liruilonger@gmail.com
+    @Version :   1.0
+    @Desc    :   多文件上传检测
+    """
+    try:
+        if 'image' not in request.files:
+            abort(400, "Upload failed, no files found ^_^")
+        files = request.files.getlist('image')
+        
+    except:
+        abort(400, "Upload failed, no files found ^_^")
+        
+    try:
+        # 验证图片完整性
+        face_imges = []
+        for file in files:
+            if file:
+                filename = file.filename
+                body = file.read()
+                if utils.is_image_file(body):
+                    json_data = detect_face(body, filename)
+                    face_imges.append(json_data)
+        response = Response(face_imges, mimetype='application/json')
+        return  response            
+    except:
+        abort(400, f"File {filename} uploaded successfully, parsing failed for unknown reason ^_^")
+   
+
+
+
+
 def detect_face(body, filename):
     """
     @Time    :   2023/09/17 21:27:47
@@ -153,7 +226,8 @@ def detect_face(body, filename):
     return json_data
 
 
+
 if __name__ == "__main__":
     init_obj()
-    app.run(port=30025, host="0.0.0.0", debug=True)  # 调用run方法，设定端口号，启动服务
+    app.run(port=flask_config['port'], host="0.0.0.0", debug=True)  # 调用run方法，设定端口号，启动服务
 
