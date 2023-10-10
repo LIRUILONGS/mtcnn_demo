@@ -1,0 +1,21 @@
+name: mtcnn
+channels:
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1=main
+  - ca-certificates=2023.08.22=h06a4308_0
+  - ld_impl_linux-64=2.38=h1181459_1
+  - libffi=3.3=he6710b0_2
+  - libgcc-ng=9.1.0=hdf63c60_0
+  - libstdcxx-ng=9.1.0=hdf63c60_0
+  - ncurses=6.3=h7f8727e_2
+  - openssl=1.1.1v=h7f8727e_0
+  - pip=23.2.1=py38h06a4308_0
+  - python=3.8.8=hdb3f193_5
+  - readline=8.1.2=h7f8727e_1
+  - setuptools=68.0.0=py38h06a4308_0
+  - sqlite=3.38.5=hc218d9a_0
+  - tk=8.6.12=h1ccaba5_0
+  - wheel=0.38.4=py38h06a4308_0
+  - xz=5.2.5=h7f8727e_1
+  - zlib=1.2.12=h7f8727e_2

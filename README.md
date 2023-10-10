@@ -51,6 +51,18 @@ python mtcnn_demo.py
 pip instasll -r  requirements.txt  -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
 ```
 
+也可以直接使用 conda 的方式
+
+```bash
+conda env create -f /environment.yml
+source activate mtcnn
+pip install -r /requirements.txt  -i  https://pypi.tuna.tsinghua.edu.cn/simple
+
+```
+
+
+
+
 
 ## 检测使用 mtcnn
 
