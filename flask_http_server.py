@@ -20,6 +20,7 @@ from flask import  Flask  # 导入Flask类
 from flask import Flask, render_template, request,jsonify,Response
 from PIL import Image
 from flask import make_response
+from flask import current_app
 import utils
 import logging
 import json
@@ -34,11 +35,9 @@ import yaml_utils as Yaml
 
 
 
-
 app = Flask(__name__)  # 实例化并命名为app实例
 # 线程池执行器
 executor = ThreadPoolExecutor()
-
 face_log = logging.basicConfig(level=logging.INFO, )
 
 config = Yaml.get_yaml_config(file_name="config/config.yaml")
@@ -58,7 +57,6 @@ class MyContextObject:
         self.mtcnn = mtcnn
         self.ready_mark = ready_mark
 
-
 def init_obj():
     """
     @Time    :   2023/09/18 01:33:26
@@ -72,8 +70,11 @@ def init_obj():
     mtcnn.build_model()
     logging.info('🚀🚀🚀🚀 构建上下文对象')
     my_context = MyContextObject(mtcnn, ready_mark=True)
-    app.my_context = my_context
+    current_app.my_context = my_context
     logging.info('🚀🚀🚀🚀🚀 \033[32m服务启动成功\033[0m')
+
+with app.app_context():
+       init_obj()
 
 
 # 定义装饰器函数，用于验证 Token
@@ -160,20 +161,19 @@ def upload():
             abort(404, "Upload failed, no files found ^_^")
         filename = file.filename
         body = file.read()
-    except:
-        abort(404, "Upload failed, no files found ^_^")
+    except Exception as e:
+        abort(404, f"Upload failed, no files found ^_^{e}")
     try:
         # 验证图片完整性
         if utils.is_image_file(body):
             json_data = detect_face(body, filename)
-            response = Response(json_data, mimetype='application/json')
-            return  response
+            return  Response(json_data, mimetype='application/json')
         else:
             abort(
                 400, f"File {filename} uploaded successfully, parsing failed, image incomplete ^_^")
-    except:
+    except Exception as e:
         abort(
-            500, f"File {filename} uploaded successfully, parsing failed for unknown reason ^_^")
+            500, f"File {filename} uploaded successfully, parsing failed for unknown reason ^_^{e}")
 
 
 
@@ -191,8 +191,8 @@ def uploads():
             abort(400, "Upload failed, no files found ^_^")
         files = request.files.getlist('image')
         
-    except:
-        abort(400, "Upload failed, no files found ^_^")
+    except Exception as e:
+        abort(400, f"Upload failed, no files found ^_^{e}")
         
     try:
         # 验证图片完整性
@@ -206,8 +206,9 @@ def uploads():
                     face_imges.append(json_data)
         response = Response(face_imges, mimetype='application/json')
         return  response            
-    except:
-        abort(400, f"File {filename} uploaded successfully, parsing failed for unknown reason ^_^")
+    except Exception as e:
+
+        abort(400, f"File {filename} uploaded successfully, parsing failed for unknown reason ^_^ {e}")
    
 
 
@@ -220,14 +221,12 @@ def detect_face(body, filename):
     @Version :   1.0
     @Desc    :   
     """
-    context = app.my_context
+    context = current_app.my_context
     faces =  context.mtcnn.detect_face(body, filename)
     json_data = json.dumps(faces)
     return json_data
 
 
-
 if __name__ == "__main__":
-    init_obj()
     app.run(port=flask_config['port'], host="0.0.0.0", debug=True)  # 调用run方法，设定端口号，启动服务
 
