@@ -38,7 +38,7 @@ import yaml_utils as Yaml
 app = Flask(__name__)  # 实例化并命名为app实例
 # 线程池执行器
 executor = ThreadPoolExecutor()
-face_log = logging.basicConfig(level=logging.INFO, )
+logging.basicConfig(level=logging.INFO, )
 
 config = Yaml.get_yaml_config(file_name="config/config.yaml")
 flask_config = config['flask']
@@ -228,5 +228,5 @@ def detect_face(body, filename):
 
 
 if __name__ == "__main__":
-    app.run(port=flask_config['port'], host="0.0.0.0", debug=True)  # 调用run方法，设定端口号，启动服务
+    app.run(port=flask_config['port'], host="0.0.0.0")  # 调用run方法，设定端口号，启动服务
 
