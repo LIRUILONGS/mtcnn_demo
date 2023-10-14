@@ -40,6 +40,8 @@ config = Yaml.get_yaml_config(file_name="config/config.yaml")
 fastapi_config = config['fastapi']
 
 
+
+
 async def get_current_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
     
     """
@@ -56,7 +58,9 @@ async def get_current_token(credentials: HTTPAuthorizationCredentials = Depends(
     valid_tokens = fastapi_config["token"]
     if not token:
         raise HTTPException(status_code=401, detail="Token is missing")
-    if token is not valid_tokens:
+    logging.info(token)
+    logging.info(valid_tokens)
+    if token !=  valid_tokens:
         raise HTTPException(status_code=401, detail="Invalid token")
     return True
 
@@ -112,7 +116,7 @@ def readyz():
 
 
 @app.post("/upload")
-async def upload(image: UploadFile):
+async def upload(image: UploadFile,token: str = Depends(get_current_token)):
     """
     @Time    :   2023/09/18 01:41:00
     @Author  :   liruilonger@gmail.com
