@@ -47,3 +47,10 @@ tornado:
 flask:
   port: 30025
   token: eyJhbGciOiJSUzI1NiIsIm
+
+
+
+## flask 配置
+fastapi:
+  port: 30025
+  token: eyJhbGciOiJSUzI1NiIsIm  

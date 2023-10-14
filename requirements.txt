@@ -83,3 +83,6 @@ urllib3==1.26.16
 Werkzeug==2.3.7
 wrapt==1.15.0
 zipp==3.15.0
+python-multipart
+fastapi
+uvicorn[standard]
