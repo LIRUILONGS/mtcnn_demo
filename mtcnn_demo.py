@@ -213,11 +213,11 @@ class MtcnnDetectFace:
         faces = {
             "image_id": image_id,
             "face_total_resp": len(detections),
-            "resp": resp,
             "face_confidence_neglect_total_resp":face_confidence_neglect_total_resp ,
             "face_blur_neglect_total_resp" :face_blur_neglect_total_resp ,
             "face_hopenet_neglect_total_resp" :face_hopenet_neglect_total_resp ,
             "face_efficient_total_resp": len(resp),
+            "resp": resp,
             "mark_image_face_b64": utils.get_img_to_base64(img)
         }
         if self.is_objectification:
