@@ -10,7 +10,6 @@
 """
 
 # here put the import lib
-import warnings
 
 import mtcnn
 import cv2
@@ -21,11 +20,13 @@ import os
 import utils
 import yaml_utils as Yaml
 from PIL import Image
-
+import logging
 from align_trans import warp_and_crop_face, get_reference_facial_points
 from hopenet_demo import HopenetFace
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-warnings.filterwarnings("ignore", category=UserWarning)
+
+logging.basicConfig(level=logging.INFO)
+
 
 
 class MtcnnDetectFace:
@@ -94,7 +95,7 @@ class MtcnnDetectFace:
         self.face_hopenet = face_hopenet
         return self
 
-    def detect_face(self, image,fname):
+    def detect_face(self, image):
         """
         @Time    :   2023/08/14 03:17:22
         @Author  :   liruilonger@gmail.com
@@ -106,14 +107,17 @@ class MtcnnDetectFace:
                        void
         """
 
-        img = utils.load_image_cvimg(image)
-        img_PIL = utils.load_image_plimg(image)
+        img = cv2.imread(image)
+        img_PIL = Image.open(image)
         detected_face = None
         # mtcnn expects RGB but OpenCV read BGR
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         detections = self.face_detector.detect_faces(img_rgb)
         image_id = utils.get_uuid()
         resp = []
+        face_confidence_neglect_total_resp = 0
+        face_blur_neglect_total_resp = 0
+        face_hopenet_neglect_total_resp = 0
         if len(detections) > 0:
 
             for detection in detections:
@@ -128,11 +132,12 @@ class MtcnnDetectFace:
                     color = (255, 0, 255)
 
                 if self.face_threshold > confidence:
-                    print(
+                    logging.info(
                         f"⚠️: {image_id} 中该置信度 {confidence}  未达到阈值 {self.face_threshold}，被弃用")
                     cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
                     cv2.putText(img, format(confidence, "0.5f"), (x - 5, y - 5), cv2.FONT_HERSHEY_COMPLEX, 0.5, color, 1,
                                 cv2.LINE_4)
+                    face_confidence_neglect_total_resp = face_confidence_neglect_total_resp + 1
                     continue
                 cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
                 cv2.putText(img, format(confidence, "0.5f"), (x - 5, y - 5), cv2.FONT_HERSHEY_COMPLEX, 0.5, color, 1,
@@ -157,8 +162,9 @@ class MtcnnDetectFace:
                 if blur_face < self.blur_threshold:
                     cv2.putText(img, format(blur_face, "0.0f"), (x + w+2, y + h), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 0, 255), 1,
                                 cv2.LINE_4)
-                    print(
+                    logging.info(
                         f"⚠️: {face_id} 中该模糊度 {blur_face} 未达到阈值 {self.blur_threshold}，被弃用")
+                    face_blur_neglect_total_resp = face_blur_neglect_total_resp + 1
                     continue
                 cv2.putText(img, format(blur_face, "0.0f"), (x + w+2, y + h), cv2.FONT_HERSHEY_COMPLEX, 0.5, color, 1,
                             cv2.LINE_4)
@@ -167,10 +173,11 @@ class MtcnnDetectFace:
                     detected_face_s)
 
                 if abs(pitch) > self.pitch_threshold or abs(yaw) > self.yaw_threshold or abs(roll) > self.roll_threshold:
-                    print(
+                    logging.info(
                         f"⚠️: {face_id} 中该欧拉角 pitch： {pitch}， yaw：{yaw}, roll:{roll} 未达到阈值 {self.pitch_threshold},{self.yaw_threshold},{self.roll_threshold}，被弃用")
                     cv2.putText(img, format(pitch, "0.2f") + "/" + format(yaw, "0.2f") + "/" + format(roll, "0.2f"), (x + w, y + h//2), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 0, 255), 1,
                                 cv2.LINE_4)
+                    face_hopenet_neglect_total_resp = face_hopenet_neglect_total_resp + 1
                     continue
                 cv2.putText(img, format(pitch, "0.2f") + "/" + format(yaw, "0.2f") + "/" + format(roll, "0.2f"), (x + w, y + h//2), cv2.FONT_HERSHEY_COMPLEX, 0.5, color, 1,
                                 cv2.LINE_4)  
@@ -187,6 +194,8 @@ class MtcnnDetectFace:
                         yaw, "0.2f") + "_r_" + format(roll, "0.2f") + "_" + format(blur_face, "0.2f")+"_.jpg", img_post)
                 resp.append({
                     "face_id": face_id,
+                    "face_coordinate": img_region,
+                    "facie5points": facial5points,
                     "face_blur": blur_face,
                     "face_pose": {
                         "pitch": pitch,
@@ -194,8 +203,6 @@ class MtcnnDetectFace:
                         "roll": roll
                     },
                     "face_confidence": confidence,
-                    "face_coordinate": img_region,
-                    "facie5points": facial5points,
                     "face_native_image_b64": utils.get_img_to_base64(detected_face),
                     "face_native_images_b64": utils.get_Image_to_base64(detected_face_s),
                     "face_align_images_b64": utils.get_Image_to_base64(detected_face_align),
@@ -205,13 +212,16 @@ class MtcnnDetectFace:
 
         faces = {
             "image_id": image_id,
-            "face_total": len(detections),
-            "face_efficient_total_resp": len(resp),
+            "face_total_resp": len(detections),
             "resp": resp,
-            "mark_image_face_b64": utils.get_img_to_base64(img),
+            "face_confidence_neglect_total_resp":face_confidence_neglect_total_resp ,
+            "face_blur_neglect_total_resp" :face_blur_neglect_total_resp ,
+            "face_hopenet_neglect_total_resp" :face_hopenet_neglect_total_resp ,
+            "face_efficient_total_resp": len(resp),
+            "mark_image_face_b64": utils.get_img_to_base64(img)
         }
         if self.is_objectification:
-            cv2.imwrite('./output/'+os.path.basename(fname), img)
+            cv2.imwrite('./output/'+os.path.basename(image), img)
         return faces
 
     def alignment_procedure(self, img, facial5points):
@@ -225,7 +235,7 @@ class MtcnnDetectFace:
                      Returns:
                        void
         """
-        # print(facial5points,type(img),type(self.refrence),type(self.crop_size))
+        # logging.info(facial5points,type(img),type(self.refrence),type(self.crop_size))
         warped_face = warp_and_crop_face(
             np.array(img), facial5points, self.refrence, crop_size=self.crop_size)
         return Image.fromarray(warped_face)
@@ -256,6 +266,6 @@ if __name__ == "__main__":
     mtcnn = MtcnnDetectFace()
     mtcnn.build_model()
     for ph in paths.list_images(mtcnn.parse_dir):
-        print(f"处理照片：{ph}")
+        logging.info(f"处理照片：{ph}")
         faces = mtcnn.detect_face(ph)
-        print(faces)
+        logging.info(faces)
