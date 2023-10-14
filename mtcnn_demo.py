@@ -10,6 +10,7 @@
 """
 
 # here put the import lib
+import warnings
 
 import mtcnn
 import cv2
@@ -26,7 +27,7 @@ from hopenet_demo import HopenetFace
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 logging.basicConfig(level=logging.INFO)
-
+warnings.filterwarnings("ignore", category=UserWarning)
 
 
 class MtcnnDetectFace:
@@ -95,7 +96,7 @@ class MtcnnDetectFace:
         self.face_hopenet = face_hopenet
         return self
 
-    def detect_face(self, image):
+    def detect_face(self, image,fname):
         """
         @Time    :   2023/08/14 03:17:22
         @Author  :   liruilonger@gmail.com
@@ -107,8 +108,8 @@ class MtcnnDetectFace:
                        void
         """
 
-        img = cv2.imread(image)
-        img_PIL = Image.open(image)
+        img = utils.load_image_cvimg(image)
+        img_PIL = utils.load_image_plimg(image)
         detected_face = None
         # mtcnn expects RGB but OpenCV read BGR
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -213,11 +214,11 @@ class MtcnnDetectFace:
         faces = {
             "image_id": image_id,
             "face_total_resp": len(detections),
-            "resp": resp,
             "face_confidence_neglect_total_resp":face_confidence_neglect_total_resp ,
             "face_blur_neglect_total_resp" :face_blur_neglect_total_resp ,
             "face_hopenet_neglect_total_resp" :face_hopenet_neglect_total_resp ,
             "face_efficient_total_resp": len(resp),
+            "resp": resp,
             "mark_image_face_b64": utils.get_img_to_base64(img)
         }
         if self.is_objectification:
