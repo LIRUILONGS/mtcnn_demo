@@ -206,7 +206,7 @@ class MtcnnDetectFace:
             "face_total": len(detections),
             "resp": resp,
             "face_total_resp": len(resp),
-            #"mark_image_face_b64": utils.get_img_to_base64(img)
+            "mark_image_face_b64": utils.get_img_to_base64(img)
         }
         if self.is_objectification:
             cv2.imwrite('./output/'+os.path.basename(image), img)
