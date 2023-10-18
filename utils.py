@@ -80,6 +80,37 @@ def get_img_url_base64(url):
     base64_bytes = base64.b64encode(image_bytes)
     return base64_bytes.decode('utf-8')
 
+def get_img_url_byte(url):
+    """
+    @Time    :   2023/05/29 21:50:42
+    @Author  :   liruilonger@gmail.com
+    @Version :   1.0
+    @Desc    :   图片 url 解析为 字节
+                 Args:
+                   url
+                 Returns:
+                   base64_bytes
+    """
+    response = requests.get(url)
+    image_bytes = response.content
+    return image_bytes
+
+
+def get_img_url_Image(url):
+    """
+    @Time    :   2023/10/11 00:16:58
+    @Author  :   liruilonger@gmail.com
+    @Version :   1.0
+    @Desc    :   url 转化为 Image.image 对象
+                 Args:
+                   
+                 Returns:
+                   void
+    """
+    response = requests.get(url)
+    image_bytes = response.content
+    image = Image.open(BytesIO(image_bytes))
+    return image
 
 def get_image_to_base64(image_path):
     """
@@ -212,9 +243,20 @@ def get_base64_to_Image(image_base64):
     """
 
     image_data = base64.b64decode(image_base64)
-    image = Image.open(BytesIO(image_data))
+    image = Image.open((image_data))
     return image
 
+
+def get_base64_to_byte(image_base64):
+    """
+    @Time    :   2023/10/18 01:06:56
+    @Author  :   liruilonger@gmail.com
+    @Version :   1.0
+    @Desc    :   B64 编码转化为 字节
+    """
+    
+    image_data = base64.b64decode(image_base64)
+    return image_data
 
 def get_file_md5(file_path):
     """

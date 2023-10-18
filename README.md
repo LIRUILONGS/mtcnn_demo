@@ -4,6 +4,9 @@ mtcnn Demo
 
 # HTTP 版本
 
+
+
+## flask 版本
 ---
 
 打了  Docker 镜像
@@ -59,4 +62,16 @@ ValueError: Calling `Model.predict` in graph mode is not supported when the `Mod
 
 ```bash
 docker pull liruilong/mtcnn-hopenet-laplacian-face
+```
+
+## fastapi 版本
+
+```bash
+python  fastapi_http_server.py
+```
+
+## tomado 版本
+
+```bash
+python tornado_http_server.py
 ```

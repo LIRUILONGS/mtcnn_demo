@@ -16,6 +16,7 @@ pip install fastapi
 """
 
 
+from typing import Dict, Any
 from globals import GlobalObject
 import yaml_utils as Yaml
 from concurrent.futures import ThreadPoolExecutor
@@ -27,7 +28,7 @@ import utils
 import logging
 import json
 import os
-from fastapi import BackgroundTasks, FastAPI, UploadFile, File, HTTPException, Depends
+from fastapi import BackgroundTasks, FastAPI, UploadFile, File, HTTPException, Depends, Body
 app = FastAPI()
 security = HTTPBearer()
 # 实例化并命名为app实例
@@ -41,16 +42,15 @@ fastapi_config = config['fastapi']
 
 
 
-
 async def get_current_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    
+
     """
     @Time    :   2023/10/13 21:28:08
     @Author  :   liruilonger@gmail.com
     @Version :   1.0
     @Desc    :   token 认证
     """
-    
+
     token = credentials.credentials
 
     # 在这里实现你的 Token 认证逻辑，例如验证 Token 的有效性、解码 Token 获取用户信息等
@@ -60,7 +60,7 @@ async def get_current_token(credentials: HTTPAuthorizationCredentials = Depends(
         raise HTTPException(status_code=401, detail="Token is missing")
     logging.info(token)
     logging.info(valid_tokens)
-    if token !=  valid_tokens:
+    if token != valid_tokens:
         raise HTTPException(status_code=401, detail="Invalid token")
     return True
 
@@ -116,7 +116,7 @@ def readyz():
 
 
 @app.post("/upload")
-async def upload(image: UploadFile,token: str = Depends(get_current_token)):
+async def upload(image: UploadFile, token: str = Depends(get_current_token)):
     """
     @Time    :   2023/09/18 01:41:00
     @Author  :   liruilonger@gmail.com
@@ -126,21 +126,87 @@ async def upload(image: UploadFile,token: str = Depends(get_current_token)):
     try:
         file = image
         if file.filename == '':
-            raise HTTPException(status_code=404, detail="Upload failed, no files found ^_^")
+            raise HTTPException(
+                status_code=404, detail="Upload failed, no files found ^_^")
         filename = file.filename
         body = await file.read()
     except Exception as e:
-        raise HTTPException(status_code=404, detail=f"Upload failed, no files found ^_^{e}")
+        raise HTTPException(
+            status_code=404, detail=f"Upload failed, no files found ^_^{e}")
     try:
         # 验证图片完整性
         if utils.is_image_file(body):
             json_data = await detect_face(body, filename)
             return json.loads(json_data)
         else:
-            raise HTTPException(status_code=400, detail=f"File {filename} uploaded successfully, parsing failed, image incomplete ^_^")
+            raise HTTPException(
+                status_code=400, detail=f"File {filename} uploaded successfully, parsing failed, image incomplete ^_^")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"File {filename} uploaded successfully, parsing failed for unknown reason ^_^{e}")
+        raise HTTPException(
+            status_code=500, detail=f"File {filename} uploaded successfully, parsing failed for unknown reason ^_^{e}")
 
+
+@app.get("/url_detect_face")
+async def url_detect_face(image_url: str, token: str = Depends(get_current_token)):
+    """
+    @Time    :   2023/09/18 01:41:00
+    @Author  :   liruilonger@gmail.com
+    @Version :   1.0
+    @Desc    :   通过照片 URL 检测
+    """
+    try:
+        if utils.is_valid_url(image_url):
+            body = utils.get_img_url_byte(image_url)
+            filename = os.path.basename(image_url)
+
+        if filename == '':
+            raise HTTPException(
+                status_code=404, detail="Upload failed, no files found ^_^")
+    except Exception as e:
+        raise HTTPException(
+            status_code=404, detail=f"Upload failed, no files found ^_^{e}")
+
+    try:
+        # 验证图片完整性
+        if utils.is_image_file(body):
+            json_data = await detect_face(body, filename)
+            return json.loads(json_data)
+        else:
+            raise HTTPException(
+                status_code=400, detail=f"File {filename} uploaded successfully, parsing failed, image incomplete ^_^")
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"File {filename} uploaded successfully, parsing failed for unknown reason ^_^{e}")
+
+
+@app.post("/b64_detect_face")
+async def b64_detect_face(image_b64: Dict[str, Any] = Body(...), token: str = Depends(get_current_token)):
+    """
+    @Time    :   2023/09/18 01:41:00
+    @Author  :   liruilonger@gmail.com
+    @Version :   1.0
+    @Desc    :   通过照片 b64编码 检测
+    """
+    try:
+
+        body = utils.get_base64_to_byte(image_b64['image_b64'])
+        filename = utils.get_uuid()
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=404, detail=f"Upload failed, no files found ^_^{e}")
+
+    try:
+        # 验证图片完整性
+        if utils.is_image_file(body):
+            json_data = await detect_face(body, filename)
+            return json.loads(json_data)
+        else:
+            raise HTTPException(
+                status_code=400, detail=f"File {filename} uploaded successfully, parsing failed, image incomplete ^_^")
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"File {filename} uploaded successfully, parsing failed for unknown reason ^_^{e}")
 
 
 async def detect_face(body, filename):
@@ -155,3 +221,6 @@ async def detect_face(body, filename):
     return json_data
 
 
+#if __name__ == "__main__":
+#    import uvicorn
+#    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)

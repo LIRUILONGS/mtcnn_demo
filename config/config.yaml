@@ -39,7 +39,7 @@ parse_dir: "./mtcnn_test/"
 ## tornado 相关配置
 tornado:
   port: 30025
-  token: eyJhbGciOiJSUzI1NiIsax24kg
+  token: eyJhbGciOiJSUzI1NiIsIm
 
 
 
@@ -50,7 +50,7 @@ flask:
 
 
 
-## flask 配置
+## fastapi 配置
 fastapi:
   port: 30025
   token: eyJhbGciOiJSUzI1NiIsIm  

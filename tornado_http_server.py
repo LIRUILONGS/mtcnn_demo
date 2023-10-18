@@ -13,7 +13,7 @@
 
 import asyncio
 
-import tornado.web
+import tornado
 import logging
 
 from mtcnn_demo import MtcnnDetectFace
