@@ -5,11 +5,23 @@ mtcnn Demo
 # HTTP 版本
 
 
+## fastapi 版本
+
+直接运行
+```bash
+uvicorn fastapi_http_server:app  --reload --port 30024
+```
+
+docker 镜像
+[https://hub.docker.com/r/liruilong/mtcnn-hopenet-laplacian-face/tags](https://hub.docker.com/r/liruilong/mtcnn-hopenet-laplacian-face/tags)
+```bash
+docker pull liruilong/mtcnn-hopenet-laplacian-face:fastapi
+
+```
+
 
 ## flask 版本
 ---
-
-打了  Docker 镜像
 
 
 默认使用 开发模式启动，提供了 gunicorn 部署环境，可以通过 docker 启动命令替换
@@ -60,15 +72,11 @@ ValueError: Calling `Model.predict` in graph mode is not supported when the `Mod
 
 [https://hub.docker.com/repository/docker/liruilong/mtcnn-hopenet-laplacian-face/general](https://hub.docker.com/repository/docker/liruilong/mtcnn-hopenet-laplacian-face/general)
 
+
 ```bash
 docker pull liruilong/mtcnn-hopenet-laplacian-face
 ```
 
-## fastapi 版本
-
-```bash
-python  fastapi_http_server.py
-```
 
 ## tomado 版本
 

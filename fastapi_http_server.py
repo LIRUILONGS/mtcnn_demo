@@ -123,6 +123,7 @@ async def upload(image: UploadFile, token: str = Depends(get_current_token)):
     @Version :   1.0
     @Desc    :   单文件上传检测
     """
+    logging.info("解析开始："+ image.filename )
     try:
         file = image
         if file.filename == '':
@@ -131,17 +132,21 @@ async def upload(image: UploadFile, token: str = Depends(get_current_token)):
         filename = file.filename
         body = await file.read()
     except Exception as e:
+        logging.error(e)
         raise HTTPException(
             status_code=404, detail=f"Upload failed, no files found ^_^{e}")
+    
     try:
         # 验证图片完整性
         if utils.is_image_file(body):
+            logging.info("解析开始："+ file.filename )
             json_data = await detect_face(body, filename)
             return json.loads(json_data)
         else:
             raise HTTPException(
                 status_code=400, detail=f"File {filename} uploaded successfully, parsing failed, image incomplete ^_^")
     except Exception as e:
+        logging.error(e)
         raise HTTPException(
             status_code=500, detail=f"File {filename} uploaded successfully, parsing failed for unknown reason ^_^{e}")
 
@@ -163,6 +168,7 @@ async def url_detect_face(image_url: str, token: str = Depends(get_current_token
             raise HTTPException(
                 status_code=404, detail="Upload failed, no files found ^_^")
     except Exception as e:
+        logging.error(e)
         raise HTTPException(
             status_code=404, detail=f"Upload failed, no files found ^_^{e}")
 
@@ -175,6 +181,7 @@ async def url_detect_face(image_url: str, token: str = Depends(get_current_token
             raise HTTPException(
                 status_code=400, detail=f"File {filename} uploaded successfully, parsing failed, image incomplete ^_^")
     except Exception as e:
+        logging.error(e)
         raise HTTPException(
             status_code=500, detail=f"File {filename} uploaded successfully, parsing failed for unknown reason ^_^{e}")
 
@@ -193,6 +200,7 @@ async def b64_detect_face(image_b64: Dict[str, Any] = Body(...), token: str = De
         filename = utils.get_uuid()
 
     except Exception as e:
+        logging.error(e)
         raise HTTPException(
             status_code=404, detail=f"Upload failed, no files found ^_^{e}")
 
@@ -205,6 +213,7 @@ async def b64_detect_face(image_b64: Dict[str, Any] = Body(...), token: str = De
             raise HTTPException(
                 status_code=400, detail=f"File {filename} uploaded successfully, parsing failed, image incomplete ^_^")
     except Exception as e:
+        logging.error(e)
         raise HTTPException(
             status_code=500, detail=f"File {filename} uploaded successfully, parsing failed for unknown reason ^_^{e}")
 
