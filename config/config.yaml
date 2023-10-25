@@ -34,26 +34,11 @@ objectification_dir: './output/'
 # 需要处理的图片位置
 parse_dir: "./mtcnn_test/"
 
-
-
-## tornado 相关配置
-tornado:
-  port: 30025
-  token: eyJhbGciOiJSUzI1NiIsIm
-
-
-
-## flask 配置
-flask:
-  port: 30025
-  token: eyJhbGciOiJSUzI1NiIsIm
-
-
-
-## flask 配置
-fastapi:
-  port: 30025
-  token: eyJhbGciOiJSUzI1NiIsIm  
-
-
-  
+queue:
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: 123456
+    database: 1 
+  image_queue_key: "A_205_Image" 
+  single_face_queue_key: "A_205_Face"

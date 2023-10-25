@@ -204,7 +204,7 @@ class MtcnnDetectFace:
                         "roll": roll
                     },
                     "face_confidence": confidence,
-                    "face_native_image_b64": utils.get_img_to_base64(detected_face),
+                    "face_native_image_b64": None, #utils.get_img_to_base64(detected_face),
                     "face_native_images_b64": utils.get_Image_to_base64(detected_face_s),
                     "face_align_images_b64": utils.get_Image_to_base64(detected_face_align),
                 })
@@ -219,7 +219,8 @@ class MtcnnDetectFace:
             "face_hopenet_neglect_total_resp" :face_hopenet_neglect_total_resp ,
             "face_efficient_total_resp": len(resp),
             "resp": resp,
-            "mark_image_face_b64": utils.get_img_to_base64(img)
+            'fname': fname,
+            "mark_image_face_b64": None #utils.get_img_to_base64(img)
         }
         if self.is_objectification:
             cv2.imwrite('./output/'+os.path.basename(image), img)
