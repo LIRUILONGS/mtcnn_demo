@@ -94,10 +94,9 @@ if __name__ == "__main__":
     while True:
         try:
             logging.info("摄像头照片消费, 对应 redis 队列：{}".format(image_key))
-            _ , image_data = rc.blpop(image_key,timeout=3) 
-            print(image_data)
-            if image_data is not None :
-                
+            image = rc.blpop(image_key,timeout=3) 
+            if image is not None :
+                _,image_data = image
                 image_data = image_data.decode('utf-8')
                 
                 image_url = image_data.split("@")[1]

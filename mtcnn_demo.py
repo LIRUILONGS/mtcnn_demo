@@ -219,7 +219,7 @@ class MtcnnDetectFace:
             "face_hopenet_neglect_total_resp" :face_hopenet_neglect_total_resp ,
             "face_efficient_total_resp": len(resp),
             "resp": resp,
-            'fname': fname,
+            'face_file_name': fname,
             "mark_image_face_b64": None #utils.get_img_to_base64(img)
         }
         if self.is_objectification:

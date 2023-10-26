@@ -1,0 +1,41 @@
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: face-mtcnn-job
+  namespace: face
+  labels:
+    job-name: face-mtcnn-job
+spec:
+  parallelism: 100
+  completions: 100
+  backoffLimit: 6
+  template:
+    metadata:
+      name: face-mtcnn-job
+      creationTimestamp: null
+      labels:
+        job-name: face-mtcnn-job
+    spec:
+      volumes:
+        - name: config
+          configMap:
+            name: face-mtcnn-job
+      containers:
+        - name: face-mtcnn-job
+          image: >-
+            registry.apps.okd.ct-hs-1.xtj.zone/li_rui_long/mtcnn-hopenet-laplacian-face:queue
+          resources:
+            limits:
+              memory: 9Gi
+            requests:
+              cpu: '10'
+              memory: 5Gi 
+          volumeMounts:
+            - name: config
+              mountPath: /face/config
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Never
+      terminationGracePeriodSeconds: 0
+status: {}
