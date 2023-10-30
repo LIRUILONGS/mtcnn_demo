@@ -230,6 +230,6 @@ async def detect_face(body, filename):
     return json_data
 
 
-#if __name__ == "__main__":
-#    import uvicorn
-#    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=9000, reload=True)

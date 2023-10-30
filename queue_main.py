@@ -94,7 +94,7 @@ if __name__ == "__main__":
     while True:
         try:
             logging.info("摄像头照片消费, 对应 redis 队列：{}".format(image_key))
-            image = rc.blpop(image_key,timeout=3) 
+            image = rc.blpop(image_key,timeout=queue_config['timeout']) 
             if image is not None :
                 _,image_data = image
                 image_data = image_data.decode('utf-8')
@@ -106,17 +106,15 @@ if __name__ == "__main__":
                 if image_name  == 'Finish':
                     logging.info("队列中没有元素，进程结束")
                     break
-                
                 # 消费队列数据
-                
                 image_face = url_detect_face(image_url,image_name)
                 logging.info("提取人脸信息，放入队列 {}".format(face_key))
                 face_data = pickle.dumps(image_face)
                 rc.rpush(face_key,face_data)
                 
             else:
-                logging.info("队列中暂时没有元素，循环等待 ^_^ ")
-                continue
+                logging.info("队列中没有元素了，进程结束啦 ^_^ ")
+                break
         except Exception as e :
             logging.error(f"{e}")
             continue  
