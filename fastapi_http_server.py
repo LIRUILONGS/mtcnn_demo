@@ -160,13 +160,14 @@ async def url_detect_face(image_url: str, token: str = Depends(get_current_token
     @Desc    :   通过照片 URL 检测
     """
     try:
+        filename = ''
         if utils.is_valid_url(image_url):
             body = utils.get_img_url_byte(image_url)
             filename = os.path.basename(image_url)
 
         if filename == '':
-            raise HTTPException(
-                status_code=404, detail="Upload failed, no files found ^_^")
+            #raise HTTPException(status_code=404, detail="Upload failed, no files found ^_^")
+            logging.error("Upload failed, no file name found ^_^")
     except Exception as e:
         logging.error(e)
         raise HTTPException(

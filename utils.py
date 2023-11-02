@@ -91,7 +91,7 @@ def get_img_url_byte(url):
                  Returns:
                    base64_bytes
     """
-    response = requests.get(url)
+    response = requests.get(url,verify=False)
     image_bytes = response.content
     return image_bytes
 
